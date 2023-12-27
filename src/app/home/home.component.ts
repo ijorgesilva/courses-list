@@ -4,6 +4,7 @@ import {interval, noop, Observable, of, Subscription, throwError, timer} from 'r
 import {catchError, delay, delayWhen, filter, finalize, map, retryWhen, shareReplay, tap} from 'rxjs/operators';
 import { CoursesService } from '../services/courses.services';
 import { LoadingService } from '../loading/loading.service';
+import { MessagesService } from '../messages/messages.service';
 
 @Component({
   selector: 'home',
@@ -18,7 +19,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private coursesService: CoursesService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private messagesService: MessagesService,
   ) {}
 
   ngOnInit() {
@@ -30,9 +32,14 @@ export class HomeComponent implements OnInit {
     const courses$ = this.coursesService.loadAllCourses()
       .pipe(
         map( course => course.sort(sortCoursesBySeqNo)),
-        // finalize(()=> this.loadingService.loadingOff()),
+        catchError( err => {
+          const message = 'Could not load courses';
+          this.messagesService.showErrors(message);
+          console.log(message, err);
+          return throwError(err);
+        })
       );
-      
+
     const loadCourses$ = this.loadingService.showLoaderUntilCompleted(courses$);
 
     this.beginnerCourses$ = courses$.pipe(

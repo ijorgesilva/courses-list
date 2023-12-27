@@ -37,6 +37,7 @@ export class CourseDialogComponent implements AfterViewInit {
             releasedAt: [moment(), Validators.required],
             longDescription: [course.longDescription,Validators.required]
         });
+
     }
 
     ngAfterViewInit() {
@@ -45,12 +46,14 @@ export class CourseDialogComponent implements AfterViewInit {
 
     save() {
       const changes = this.form.value;
-      this.courseService.saveCourse( this.course.id, changes ).subscribe(
-        val => {
-          this.dialogRef.close(val);
-        }
-      );
-      
+      const saveCourse$ = this.courseService.saveCourse( this.course.id, changes );
+
+      this.loadingService.showLoaderUntilCompleted(saveCourse$)
+        .subscribe(
+          val => {
+            this.dialogRef.close(val);
+          }
+        );
     }
 
     close() {
