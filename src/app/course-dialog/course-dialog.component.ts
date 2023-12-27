@@ -11,7 +11,10 @@ import { LoadingService } from '../loading/loading.service';
 @Component({
     selector: 'course-dialog',
     templateUrl: './course-dialog.component.html',
-    styleUrls: ['./course-dialog.component.css']
+    styleUrls: ['./course-dialog.component.css'],
+    providers: [
+      LoadingService,
+    ]
 })
 export class CourseDialogComponent implements AfterViewInit {
 
