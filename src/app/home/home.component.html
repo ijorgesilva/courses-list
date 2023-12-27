@@ -8,21 +8,18 @@
         <mat-tab label="Beginners">
           <courses-card-list
             [courses]="(beginnerCourses$ | async)"
-            (coursesChanged)="reloadCourses()"
           ></courses-card-list>
         </mat-tab>
 
         <mat-tab label="Intermediate">
           <courses-card-list
             [courses]="(intermediateCourses$ | async)"
-            (coursesChanged)="reloadCourses()"
           ></courses-card-list>
         </mat-tab>
 
         <mat-tab label="Advanced">
           <courses-card-list
             [courses]="(advancedCourses$ | async)"
-            (coursesChanged)="reloadCourses()"
           ></courses-card-list>
         </mat-tab>
 

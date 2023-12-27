@@ -22,7 +22,7 @@ export class CoursesStore {
   }
 
   private loadAllCourses(){
-    this.courses$ = this.http.get<Course[]>('/api/courses')
+    const loadCourses$ = this.http.get<Course[]>('/api/courses')
       .pipe(
         map(response => response['payload']),
         catchError(
@@ -35,7 +35,7 @@ export class CoursesStore {
         ),
         tap( courses => this.subject.next(courses) ),
       )
-    this.loading.showLoaderUntilCompleted(this.courses$).subscribe();
+    this.loading.showLoaderUntilCompleted(loadCourses$).subscribe();
   }
 
   filterByCategory(category: string): Observable<Course[]>{
@@ -56,8 +56,8 @@ export class CoursesStore {
       ...changes,
     };
 
-    const newCourses: Course[] = courses.slice();
-    newCourse[index] = newCourse;
+    const newCourses: Course[] = courses.slice(0);
+    newCourses[index] = newCourse;
 
     this.subject.next(newCourses);
 
