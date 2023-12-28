@@ -32,12 +32,14 @@
   </ng-container>
 
   <ng-template #details>
+
     <button mat-raised-button (click)="closeDetails()">
       <mat-icon>arrow_back_ios</mat-icon>
       Back to search
     </button>
 
-    <lesson></lesson>
+    <lesson [lesson]="activeLesson"></lesson>
+
   </ng-template>
 
 </div>
