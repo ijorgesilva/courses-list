@@ -5,6 +5,7 @@ import { catchError, map, shareReplay, tap } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { LoadingService } from "../loading/loading.service";
 import { MessagesService } from "../messages/messages.service";
+import { Lesson } from "../model/lesson";
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,28 @@ export class CoursesStore {
     private message: MessagesService,
   ){
     this.loadAllCourses();
+  }
+
+  loadCourseById(courseId: number): Observable<Course>{
+    return this.http.get<Course>(`/api/courses/${courseId}`)
+      .pipe(
+        shareReplay(),
+      )
+  }
+
+  loadAllCourseLessons(courseId: number): Observable<Lesson[]>{
+    const loadLessons$ = this.http.get<Lesson[]>(`/api/lessons`, {
+      params: {
+        courseId: courseId.toString(),
+        pageSize: '1000',
+      }
+    })
+      .pipe(
+        map( res => res['payload']),
+        shareReplay(),
+      )
+    this.loading.showLoaderUntilCompleted(loadLessons$).subscribe();
+    return loadLessons$;
   }
 
   private loadAllCourses(){

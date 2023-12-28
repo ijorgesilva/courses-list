@@ -1,54 +1,46 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Course} from '../model/course';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  startWith,
-  tap,
-  delay,
-  map,
-  concatMap,
-  switchMap,
-  withLatestFrom,
-  concatAll, shareReplay, catchError
-} from 'rxjs/operators';
-import {merge, fromEvent, Observable, concat, throwError} from 'rxjs';
-import {Lesson} from '../model/lesson';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { Course } from "../model/course";
+import { Lesson } from "../model/lesson";
+import { Observable, combineLatest } from "rxjs";
+import { LoadingService } from "../loading/loading.service";
+import { MessagesService } from "../messages/messages.service";
+import { CoursesStore } from "../services/courses.store";
+import { map, startWith } from "rxjs/operators";
 
-
+interface CourseData {
+  course: Course,
+  lessons: Lesson[],
+}
 @Component({
-  selector: 'course',
-  templateUrl: './course.component.html',
-  styleUrls: ['./course.component.css']
+  selector: "course",
+  templateUrl: "./course.component.html",
+  styleUrls: ["./course.component.css"],
+  providers: [ LoadingService, MessagesService ]
 })
 export class CourseComponent implements OnInit {
 
-  course: Course;
+  data$: Observable<CourseData>;
 
-  lessons: Lesson[];
-
-  constructor(private route: ActivatedRoute) {
-
-
-  }
+  constructor(
+    private route: ActivatedRoute,
+    private coursesStore: CoursesStore,
+  ) {}
 
   ngOnInit() {
+    const courseId = parseInt(this.route.snapshot.paramMap.get("courseId"));
+    const course$ = this.coursesStore.loadCourseById(courseId)
+      .pipe(
+        startWith()
+      );
+    const lessons$ = this.coursesStore.loadAllCourseLessons(courseId)
+      .pipe(
+        startWith([])
+      );
 
-
-
+    this.data$ = combineLatest([course$, lessons$])
+    .pipe(
+      map( ([course, lessons]) => {return {course, lessons}} ),
+    );
   }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
